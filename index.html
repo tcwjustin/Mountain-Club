@@ -545,12 +545,14 @@ footer{text-align:center;padding:30px;color:var(--stone);font-size:.76rem;font-f
    完整步驟見 README.md。
    =========================================================================== */
 const firebaseConfig = {
-  apiKey:     "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT.firebaseapp.com",
-  projectId:  "PASTE_PROJECT_ID",
-  appId:      "PASTE_APP_ID"
+  apiKey:            "AIzaSyDgmOL7vminCBuc1GaKw0dnQVmEpcxWDD8",
+  authDomain:        "mountain-club-e69d9.firebaseapp.com",
+  projectId:         "mountain-club-e69d9",
+  storageBucket:     "mountain-club-e69d9.firebasestorage.app",
+  messagingSenderId: "563591189016",
+  appId:             "1:563591189016:web:55e6ca5eaa4364bd2fe96d"
 };
-const ADMIN_EMAIL = "";   // 你的 Gmail，例："you@gmail.com"。此帳號永遠可登入，且首次登入自動成為系統管理員
+const ADMIN_EMAIL = "tcwjustin86@gmail.com";   // 永遠可登入，首次登入自動成為系統管理員
 
 let FB_ENABLED = !firebaseConfig.apiKey.includes("PASTE");
 let A=null, S=null, fbAuth=null, clubRef=null;
