@@ -1,0 +1,18 @@
+{
+  "name": "想山享山 登山社",
+  "short_name": "想山享山",
+  "description": "登山社團的百岳清單、出隊紀錄、行程規劃與成就徽章",
+  "lang": "zh-Hant",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf0db",
+  "theme_color": "#1d4233",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
