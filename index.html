@@ -210,11 +210,31 @@ main{max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(16px,4vw,
 
 /* ===== trips / planning ===== */
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:8px}
+.rangebtn{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:left;font-size:1rem;color:var(--pine);cursor:pointer}
+.rangebtn:hover{border-color:var(--moss)}
+.calpanel{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;margin:4px 0 12px;max-width:340px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:600;color:var(--pine)}
+.cal-head button{font-size:1.2rem;padding:0 12px;border-radius:8px;background:none;cursor:pointer;line-height:1.8}
+.cal-head button:hover{background:var(--mist)}
+.cal-wk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:.72rem;color:var(--stone);margin-bottom:4px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-d{aspect-ratio:1;border:none;background:none;border-radius:8px;cursor:pointer;font-size:.86rem;color:var(--pine);padding:0}
+.cal-d:hover{background:var(--mist)}
+.cal-empty{visibility:hidden}
+.cal-inrange{background:rgba(53,107,79,.14)}
+.cal-sel{background:var(--moss);color:#fff;font-weight:700}
+.cal-sel:hover{background:var(--moss)}
+.cal-foot{display:flex;align-items:center;gap:8px;margin-top:10px}
+.cal-foot button{font-size:.82rem;padding:5px 12px;border-radius:8px;background:none;cursor:pointer;color:var(--ridge)}
+.cal-foot #calDone{margin-left:auto;color:#fff}
 .form-grid label{display:block;font-size:.78rem;color:var(--moss);margin-bottom:5px;letter-spacing:.04em}
 .form-grid input,.form-grid select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .peakpick{max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
 .peakpick label{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:7px;font-size:.86rem;cursor:pointer}
 .peakpick label:hover{background:rgba(53,107,79,.07)}
+.flabel{display:block;font-size:.78rem;color:var(--moss);margin-bottom:6px;letter-spacing:.04em}
+.ftext{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;resize:vertical;font-size:1rem}
+.peakpick .muted{color:var(--stone);font-family:var(--font-data);font-size:.72rem}
 .peakpick input{width:auto}
 .trip{border:1px solid var(--line-soft);border-radius:14px;padding:18px;background:var(--cloud);margin-bottom:14px}
 .trip .th{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
@@ -224,6 +244,11 @@ main{max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(16px,4vw,
 .diff.d1{background:rgba(154,174,107,.25);color:#566b2e}
 .diff.d2{background:rgba(207,130,51,.2);color:#a5651f}
 .diff.d3{background:rgba(150,60,40,.18);color:#8c3320}
+.trip.tripdone{opacity:.6}
+.tripbadge{font-size:.66rem;font-family:var(--font-data);letter-spacing:.1em;padding:3px 10px;border-radius:20px;background:rgba(53,107,79,.14);color:var(--moss);white-space:nowrap}
+.tripbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-convert{background:rgba(207,130,51,.16);color:#a5651f}
+.btn-convert:hover{background:rgba(207,130,51,.28)}
 .trip .pks{font-size:.85rem;color:var(--ridge);margin:8px 0 12px}
 .trip .foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
 .capbar{flex:1;min-width:140px}
@@ -459,6 +484,7 @@ footer{text-align:center;padding:30px;color:var(--stone);font-size:.76rem;font-f
       <div class="eyebrow">EXPEDITION LOG</div>
       <h1 class="h-title">登山時間軸</h1>
       <p class="h-sub">依時間排列的每一趟出隊紀錄，包含地點、隊員與心得。</p>
+      <div id="hikeActions"></div>
       <div class="timeline" id="fullTimeline"></div>
     </section>
 
@@ -503,10 +529,20 @@ footer{text-align:center;padding:30px;color:var(--stone);font-size:.76rem;font-f
         <div class="chart-title">建立新行程</div>
         <div class="form-grid">
           <div><label>行程名稱</label><input id="tTitle" placeholder="例：奇萊主北二日"></div>
-          <div><label>出發日期</label><input id="tDate" type="date"></div>
-          <div><label>難度</label><select id="tDiff"><option value="1">入門 / 一日</option><option value="2">進階 / 多日</option><option value="3">困難 / 縱走</option></select></div>
+          <div><label>行程日期（點選起訖）</label><button type="button" id="tRange" class="rangebtn">請選擇起訖日期</button></div>
           <div><label>人數上限</label><input id="tCap" type="number" min="1" value="8"></div>
         </div>
+        <div id="calPanel" class="calpanel" style="display:none">
+          <div class="cal-head">
+            <button type="button" id="calPrev" aria-label="上個月">‹</button>
+            <div id="calTitle"></div>
+            <button type="button" id="calNext" aria-label="下個月">›</button>
+          </div>
+          <div class="cal-wk"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="cal-foot"><button type="button" id="calClear">清除</button><button type="button" id="calToday">今天</button><button type="button" id="calDone" class="btn-sm btn-join">完成</button></div>
+        </div>
+        <div id="tDaysHint" style="font-size:.8rem;color:var(--ridge);margin:-2px 0 12px"></div>
         <div style="margin:6px 0 14px">
           <label style="font-size:.78rem;color:var(--moss);display:block;margin-bottom:6px">納入山頭（清單外可自訂）</label>
           <div class="peakpick" id="tPeaks"></div>
@@ -533,6 +569,7 @@ footer{text-align:center;padding:30px;color:var(--stone);font-size:.76rem;font-f
 <div class="modal" id="profileModal"><div class="box" id="profileBox"></div></div>
 <div class="modal" id="memberModal"><div class="box" id="memberBox"></div></div>
 <div class="modal" id="peakModal"><div class="box" id="peakBox"></div></div>
+<div class="modal" id="hikeModal"><div class="box" id="hikeBox"></div></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -684,7 +721,108 @@ const peaksSeed = [
   {n:"合歡主峰",e:3417,r:"合歡群峰",g:"",c:"百岳"},
   {n:"合歡山西峰",e:3145,r:"合歡群峰",g:"",c:"百岳"},
   {n:"石門山",e:3237,r:"合歡群峰",g:"",c:"百岳"},
-  {n:"屏風山",e:3250,r:"合歡群峰",g:"",c:"百岳"}
+  {n:"屏風山",e:3250,r:"合歡群峰",g:"",c:"百岳"},
+  // 小百岳（100 座 · 體育署 2017 修訂版／維基百科）
+  {n:"大屯山",e:1092,r:"台北市",g:"",c:"小百岳"},
+  {n:"七星山",e:1120,r:"台北市",g:"",c:"小百岳"},
+  {n:"大武崙山",e:231,r:"基隆市",g:"",c:"小百岳"},
+  {n:"槓子寮山",e:163,r:"基隆市",g:"",c:"小百岳"},
+  {n:"觀音山",e:616,r:"新北市",g:"",c:"小百岳"},
+  {n:"基隆山",e:588,r:"新北市",g:"",c:"小百岳"},
+  {n:"紅淡山",e:210,r:"基隆市",g:"",c:"小百岳"},
+  {n:"大崙頭山",e:478,r:"台北市",g:"",c:"小百岳"},
+  {n:"劍潭山",e:153,r:"台北市",g:"",c:"小百岳"},
+  {n:"五分山",e:757,r:"新北市",g:"",c:"小百岳"},
+  {n:"姜子寮山",e:729,r:"基隆市",g:"",c:"小百岳"},
+  {n:"汐止大尖山",e:460,r:"新北市",g:"",c:"小百岳"},
+  {n:"南港山",e:375,r:"台北市",g:"",c:"小百岳"},
+  {n:"土庫岳",e:389,r:"新北市",g:"",c:"小百岳"},
+  {n:"大棟山",e:405,r:"新北市",g:"",c:"小百岳"},
+  {n:"南勢角山",e:302,r:"新北市",g:"",c:"小百岳"},
+  {n:"二格山",e:678,r:"新北市",g:"",c:"小百岳"},
+  {n:"天上山",e:430,r:"新北市",g:"",c:"小百岳"},
+  {n:"鳶山",e:321,r:"新北市",g:"",c:"小百岳"},
+  {n:"獅仔頭山",e:858,r:"新北市",g:"",c:"小百岳"},
+  {n:"金面山",e:667,r:"桃園市",g:"",c:"小百岳"},
+  {n:"東眼山",e:1212,r:"桃園市",g:"",c:"小百岳"},
+  {n:"溪洲山",e:577,r:"桃園市",g:"",c:"小百岳"},
+  {n:"石門山（桃園）",e:551,r:"桃園市",g:"",c:"小百岳"},
+  {n:"石牛山",e:671,r:"桃園市",g:"",c:"小百岳"},
+  {n:"十八尖山",e:132,r:"新竹市",g:"",c:"小百岳"},
+  {n:"飛鳳山",e:462,r:"新竹縣",g:"",c:"小百岳"},
+  {n:"李棟山",e:1914,r:"新竹縣",g:"",c:"小百岳"},
+  {n:"獅頭山",e:492,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"五指山",e:1062,r:"新竹縣",g:"",c:"小百岳"},
+  {n:"鵝公髻山",e:1579,r:"新竹縣",g:"",c:"小百岳"},
+  {n:"向天湖山",e:1225,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"仙山",e:967,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"加里山",e:2220,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"火炎山",e:596,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"關刀山",e:889,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"馬那邦山",e:1407,r:"苗栗縣",g:"",c:"小百岳"},
+  {n:"鐵砧山",e:236,r:"台中市",g:"",c:"小百岳"},
+  {n:"稍來山",e:2307,r:"台中市",g:"",c:"小百岳"},
+  {n:"聚興山",e:500,r:"台中市",g:"",c:"小百岳"},
+  {n:"頭嵙山",e:859,r:"台中市",g:"",c:"小百岳"},
+  {n:"南觀音山",e:318,r:"台中市",g:"",c:"小百岳"},
+  {n:"三汀山",e:480,r:"台中市",g:"",c:"小百岳"},
+  {n:"暗影山",e:997,r:"台中市",g:"",c:"小百岳"},
+  {n:"大橫屏山",e:1206,r:"台中市",g:"",c:"小百岳"},
+  {n:"阿罩霧山",e:249,r:"台中市",g:"",c:"小百岳"},
+  {n:"九份二山",e:1174,r:"南投縣",g:"",c:"小百岳"},
+  {n:"橫山",e:443,r:"南投縣",g:"",c:"小百岳"},
+  {n:"貓囒山",e:1016,r:"南投縣",g:"",c:"小百岳"},
+  {n:"集集大山",e:1392,r:"南投縣",g:"",c:"小百岳"},
+  {n:"松柏坑山",e:431,r:"彰化縣",g:"",c:"小百岳"},
+  {n:"後尖山",e:1008,r:"南投縣",g:"",c:"小百岳"},
+  {n:"鳳凰山",e:1698,r:"南投縣",g:"",c:"小百岳"},
+  {n:"金柑樹山",e:2091,r:"南投縣",g:"",c:"小百岳"},
+  {n:"石壁山",e:1751,r:"雲林縣",g:"",c:"小百岳"},
+  {n:"雲嘉大尖山",e:1305,r:"雲林縣",g:"",c:"小百岳"},
+  {n:"梨子腳山",e:1176,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"獨立山",e:840,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"大塔山",e:2664,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"大凍山（奮起湖）",e:1976,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"大湖尖山",e:1316,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"紅毛埤山",e:150,r:"嘉義市",g:"",c:"小百岳"},
+  {n:"大凍山（太平）",e:1241,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"崁頭山",e:844,r:"台南市",g:"",c:"小百岳"},
+  {n:"三腳南山",e:1186,r:"嘉義縣",g:"",c:"小百岳"},
+  {n:"西阿里關山",e:973,r:"台南市",g:"",c:"小百岳"},
+  {n:"竹子尖山",e:1110,r:"台南市",g:"",c:"小百岳"},
+  {n:"東藤枝山",e:1565,r:"高雄市",g:"",c:"小百岳"},
+  {n:"白雲山",e:1044,r:"高雄市",g:"",c:"小百岳"},
+  {n:"刣牛湖山",e:798,r:"台南市",g:"",c:"小百岳"},
+  {n:"鳴海山",e:1411,r:"高雄市",g:"",c:"小百岳"},
+  {n:"旗尾山",e:315,r:"高雄市",g:"",c:"小百岳"},
+  {n:"尾寮山",e:1427,r:"高雄市",g:"",c:"小百岳"},
+  {n:"大崗山",e:312,r:"高雄市",g:"",c:"小百岳"},
+  {n:"觀音山（高雄）",e:177,r:"高雄市",g:"",c:"小百岳"},
+  {n:"笠頂山",e:659,r:"屏東縣",g:"",c:"小百岳"},
+  {n:"壽山",e:356,r:"高雄市",g:"",c:"小百岳"},
+  {n:"棚集山",e:899,r:"屏東縣",g:"",c:"小百岳"},
+  {n:"女仍山",e:804,r:"屏東縣",g:"",c:"小百岳"},
+  {n:"里龍山",e:1062,r:"屏東縣",g:"",c:"小百岳"},
+  {n:"大山母山",e:325,r:"屏東縣",g:"",c:"小百岳"},
+  {n:"灣坑頭山",e:616,r:"新北市",g:"",c:"小百岳"},
+  {n:"三角崙山",e:1029,r:"宜蘭縣",g:"",c:"小百岳"},
+  {n:"鵲子山",e:679,r:"宜蘭縣",g:"",c:"小百岳"},
+  {n:"三星山",e:2352,r:"宜蘭縣",g:"",c:"小百岳"},
+  {n:"卡拉寶山",e:2397,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"立霧山",e:1274,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"初音山",e:906,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"鯉魚山",e:601,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"月眉山",e:614,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"八里灣山",e:924,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"萬人山",e:886,r:"花蓮縣",g:"",c:"小百岳"},
+  {n:"都蘭山",e:1190,r:"台東縣",g:"",c:"小百岳"},
+  {n:"太麻里山",e:1340,r:"台東縣",g:"",c:"小百岳"},
+  {n:"加奈美山",e:780,r:"台東縣",g:"",c:"小百岳"},
+  {n:"巴塱衛山",e:325,r:"台東縣",g:"",c:"小百岳"},
+  {n:"紅頭山",e:552,r:"台東縣",g:"",c:"小百岳"},
+  {n:"雲台山",e:248,r:"連江縣",g:"",c:"小百岳"},
+  {n:"太武山",e:253,r:"金門縣",g:"",c:"小百岳"},
+  {n:"蛇頭山",e:20,r:"澎湖縣",g:"",c:"小百岳"}
 ];
 
 const ROLES = ["系統管理員","社長","副社長","幹部","隊員"];
@@ -708,6 +846,11 @@ let peakSeq = Math.max(0, ...state.peaks.map(p=>p.id)) + 1;
 const $ = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 const fmtDate = d => { const x=new Date(d); return `${x.getFullYear()}.${String(x.getMonth()+1).padStart(2,'0')}.${String(x.getDate()).padStart(2,'0')}`; };
+function tStart(t){ return t.start || t.date || ""; }
+function tEnd(t){ return t.end || t.start || t.date || ""; }
+function daysBetween(s,e){ if(!s) return 0; if(!e || e<s) return 1; return Math.round((new Date(e)-new Date(s))/86400000)+1; }
+function addDays(dateStr,n){ const d=new Date(dateStr+"T00:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); }
+function fmtTripWhen(t){ const s=tStart(t), e=tEnd(t); return (!e||e===s) ? `${fmtDate(s)} · 單日` : `${fmtDate(s)} – ${fmtDate(e)} · 共 ${daysBetween(s,e)} 天`; }
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 function memberNames(){ return state.members.filter(m=>m.active).map(m=>m.name); }
 function findMember(name){ return state.members.find(m=>m.name===name); }
@@ -790,7 +933,7 @@ function renderHome(){
 
   // next trip
   const up = upcomingTrips()[0];
-  if(up){ $("#heroNext").textContent = up.title; $("#heroNextDate").textContent = fmtDate(up.date) + " 出發"; }
+  if(up){ $("#heroNext").textContent = up.title; $("#heroNextDate").textContent = fmtDate(tStart(up)) + " 出發"; }
   else { $("#heroNext").textContent="尚未規劃"; $("#heroNextDate").textContent=""; }
 
   drawProfile(bai,100);
@@ -860,7 +1003,75 @@ function renderTimeline(list){
       </div>
     </div>`).join("");
 }
-function renderFullTimeline(){ $("#fullTimeline").innerHTML = renderTimeline(sortedHikes()); }
+function renderFullTimeline(){
+  $("#hikeActions").innerHTML = canManage()
+    ? `<div class="controls"><button class="btn-sm btn-join" id="addHikeBtn" style="margin-left:auto">＋ 新增出隊紀錄</button></div>`
+    : "";
+  const b=$("#addHikeBtn"); if(b) b.onclick = openHikeAdd;
+  $("#fullTimeline").innerHTML = renderTimeline(sortedHikes());
+}
+let convertingTripId = null;
+function openHikeAdd(prefill){
+  convertingTripId = prefill ? prefill.id : null;
+  const peakBoxes = state.peaks.map(p=>`<label><input type="checkbox" value="${p.name}"> ${p.name} <span class="muted">${p.cat}·${p.elev}m</span></label>`).join("");
+  const pplBoxes = memberNames().length
+    ? memberNames().map(n=>`<label><input type="checkbox" value="${n}"> ${n}</label>`).join("")
+    : `<div class="empty" style="padding:8px">名冊還沒有其他隊員</div>`;
+  $("#hikeBox").innerHTML = `
+    <button class="x" id="hkClose" aria-label="關閉">✕</button>
+    <div class="p-head"><span class="pav">▲</span><div><h3>${prefill?"行程轉出隊紀錄":"新增出隊紀錄"}</h3><div class="pr">記錄一趟已完成的行程</div></div></div>
+    <div class="form-grid" style="margin-top:10px">
+      <div><label>日期</label><input id="hkDate" type="date"></div>
+      <div><label>標題</label><input id="hkTitle" placeholder="例：玉山主東"></div>
+      <div style="grid-column:1/-1"><label>地點</label><input id="hkLoc" placeholder="例：玉山山脈 · 南投"></div>
+    </div>
+    <div style="margin:12px 0 10px"><label class="flabel">登頂山頭（勾選後會自動標記為已完成）</label>
+      <div class="peakpick" id="hkPeaks">${peakBoxes}</div></div>
+    <div style="margin:10px 0"><label class="flabel">參加隊員</label>
+      <div class="peakpick" id="hkPpl">${pplBoxes}</div></div>
+    <div style="margin:10px 0"><label class="flabel">心得（選填）</label>
+      <textarea id="hkNote" rows="3" class="ftext" placeholder="這趟的記憶…"></textarea></div>
+    <button class="btn-sm btn-join" id="hkSave">儲存紀錄</button>`;
+  $("#hkDate").value = prefill ? tStart(prefill) : new Date().toISOString().slice(0,10);
+  if(prefill){
+    $("#hkTitle").value = prefill.title;
+    const wantP=new Set(prefill.peaks||[]);
+    $$("#hkPeaks input").forEach(i=>{ if(wantP.has(i.value)) i.checked=true; });
+    const wantU=new Set(prefill.rsvp||[]);
+    $$("#hkPpl input").forEach(i=>{ if(wantU.has(i.value)) i.checked=true; });
+  } else {
+    const meBox=[...$("#hkPpl").querySelectorAll("input")].find(i=>i.value===state.user.name);
+    if(meBox) meBox.checked=true;
+  }
+  $("#hkClose").onclick=()=>{ convertingTripId=null; $("#hikeModal").classList.remove("on"); };
+  $("#hkSave").onclick=saveHike;
+  $("#hikeModal").classList.add("on");
+}
+function saveHike(){
+  const date=$("#hkDate").value;
+  const title=$("#hkTitle").value.trim();
+  if(!date || !title){ toast("請填寫日期與標題"); return; }
+  // 防呆：同日期＋同標題不重複存
+  if(state.hikes.some(h=> h.date===date && (h.title||"").trim()===title)){
+    if(convertingTripId!=null){
+      const t=state.trips.find(x=>x.id===convertingTripId); if(t) t.done=true; convertingTripId=null;
+      $("#hikeModal").classList.remove("on"); toast("此行程已有對應紀錄，已標記為已轉換"); renderTrips();
+      return;
+    }
+    toast("已有相同日期與標題的紀錄，未重複新增"); return;
+  }
+  const peaks=$$("#hkPeaks input:checked").map(i=>i.value);
+  const ppl=$$("#hkPpl input:checked").map(i=>i.value);
+  state.hikes.push({date, title, loc:$("#hkLoc").value.trim(), peaks, ppl, note:$("#hkNote").value.trim()});
+  // 自動標記登頂（冪等：已完成者不覆蓋、不重複）
+  let marked=0;
+  peaks.forEach(pn=>{ const p=state.peaks.find(x=>x.name===pn); if(p && !p.climbed){ p.climbed=true; p.date=date; marked++; } });
+  // 若是行程轉換，標記該行程已轉換（防止重複轉）
+  if(convertingTripId!=null){ const t=state.trips.find(x=>x.id===convertingTripId); if(t) t.done=true; convertingTripId=null; }
+  $("#hikeModal").classList.remove("on");
+  toast(`已新增紀錄${marked?`，標記 ${marked} 座新登頂`:""}`);
+  renderFullTimeline(); renderHome(); renderStats(); renderMembers(); renderPeaks(); renderCatProgress(); renderTrips();
+}
 
 /* ============================================================
    渲染：百岳清單
@@ -1021,61 +1232,113 @@ function renderStats(){
    渲染：行程規劃
    ============================================================ */
 function upcomingTrips(){
-  return [...state.trips].sort((a,b)=> a.date.localeCompare(b.date));
+  return [...state.trips].sort((a,b)=> tStart(a).localeCompare(tStart(b)));
 }
 function renderTripPicker(){
   $("#tPeaks").innerHTML = state.peaks.map(p=>`<label><input type="checkbox" value="${p.name}"> ${p.name} <span style="color:var(--stone);font-family:var(--font-data);font-size:.72rem">${p.cat}·${p.elev}m</span></label>`).join("");
 }
+let pickStart=null, pickEnd=null, calYear, calMonth;
+function initCalMonth(){
+  if(pickStart){ const d=new Date(pickStart+"T00:00:00Z"); calYear=d.getUTCFullYear(); calMonth=d.getUTCMonth(); }
+  else { const t=new Date(); calYear=t.getFullYear(); calMonth=t.getMonth(); }
+}
+function renderCal(){
+  const startWd=new Date(Date.UTC(calYear,calMonth,1)).getUTCDay();
+  const dim=new Date(Date.UTC(calYear,calMonth+1,0)).getUTCDate();
+  let cells="";
+  for(let i=0;i<startWd;i++) cells+=`<span class="cal-d cal-empty"></span>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    let cls="cal-d";
+    if(pickStart && ds===pickStart) cls+=" cal-sel";
+    if(pickEnd && ds===pickEnd) cls+=" cal-sel";
+    if(pickStart && pickEnd && ds>pickStart && ds<pickEnd) cls+=" cal-inrange";
+    cells+=`<button type="button" class="${cls}" data-d="${ds}">${d}</button>`;
+  }
+  $("#calGrid").innerHTML=cells;
+  $("#calTitle").textContent=`${calYear} 年 ${calMonth+1} 月`;
+  $$("#calGrid .cal-d[data-d]").forEach(b=> b.onclick=()=> pickDay(b.dataset.d));
+}
+function pickDay(ds){
+  if(!pickStart || (pickStart && pickEnd)){ pickStart=ds; pickEnd=null; }
+  else if(ds < pickStart){ pickStart=ds; }
+  else { pickEnd=ds; }
+  renderCal(); updateRangeUI();
+}
+function updateRangeUI(){
+  const s=pickStart, e=pickEnd||pickStart;
+  if(!s){ $("#tRange").textContent="請選擇起訖日期"; $("#tDaysHint").textContent=""; return; }
+  $("#tRange").textContent = (e===s) ? `${fmtDate(s)} · 單日` : `${fmtDate(s)} – ${fmtDate(e)}`;
+  $("#tDaysHint").textContent = (e===s) ? "單日行程" : `共 ${daysBetween(s,e)} 天`;
+}
+$("#tRange").onclick=()=>{
+  const p=$("#calPanel"); const show=p.style.display==="none";
+  p.style.display = show?"block":"none";
+  if(show){ initCalMonth(); renderCal(); }
+};
+$("#calPrev").onclick=()=>{ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCal(); };
+$("#calNext").onclick=()=>{ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCal(); };
+$("#calClear").onclick=()=>{ pickStart=null; pickEnd=null; renderCal(); updateRangeUI(); };
+$("#calToday").onclick=()=>{ const t=new Date(); calYear=t.getFullYear(); calMonth=t.getMonth(); renderCal(); };
+$("#calDone").onclick=()=>{ $("#calPanel").style.display="none"; };
 $("#addTrip").onclick = ()=>{
   const title=$("#tTitle").value.trim();
-  const date=$("#tDate").value;
-  const diff=+$("#tDiff").value;
+  const start=pickStart;
   const cap=+$("#tCap").value||8;
+  if(!title || !start){ toast("請填寫行程名稱與日期"); return; }
+  const end=pickEnd||pickStart;
   const peaks=$$("#tPeaks input:checked").map(i=>i.value);
   const custom=$("#tCustom").value.trim();
   if(custom) custom.split(/[、,，\s]+/).filter(Boolean).forEach(x=>peaks.push(x));
-  if(!title||!date){ toast("請填寫行程名稱與日期"); return; }
-  state.trips.push({id:tripSeq++,title,date,peaks,diff,cap,rsvp:[state.user.name]});
-  $("#tTitle").value="";$("#tDate").value="";$("#tCustom").value="";
+  state.trips.push({id:tripSeq++,title,start,end,peaks,cap,rsvp:[state.user.name]});
+  $("#tTitle").value=""; $("#tCustom").value="";
+  pickStart=null; pickEnd=null; updateRangeUI(); $("#calPanel").style.display="none";
   $$("#tPeaks input:checked").forEach(i=>i.checked=false);
   toast("行程已建立，你已自動報名");
   renderTrips(); renderHome();
 };
-const diffLabel={1:"入門",2:"進階",3:"困難"};
 function renderTrips(){
   const list=upcomingTrips();
   $("#tripList").innerHTML = list.length ? list.map(t=>{
     const me=t.rsvp.includes(state.user.name);
     const pct=Math.min(100,t.rsvp.length/t.cap*100);
     const full=t.rsvp.length>=t.cap && !me;
-    return `<div class="trip" data-id="${t.id}">
+    const done=!!t.done;
+    return `<div class="trip ${done?'tripdone':''}" data-id="${t.id}">
       <div class="th">
-        <div><h4>${t.title}</h4><div class="when">${fmtDate(t.date)} 出發</div></div>
-        <span class="diff d${t.diff}">${diffLabel[t.diff]}</span>
+        <div><h4>${t.title}</h4><div class="when">${fmtTripWhen(t)}</div></div>
+        ${done?'<span class="tripbadge">✓ 已轉為出隊紀錄</span>':''}
       </div>
       <div class="pks">${t.peaks.length?t.peaks.join("、"):"未指定山頭"}</div>
-      <div class="foot">
+      ${done ? "" : `<div class="foot">
         <div class="capbar">
           <div class="clab"><span>報名人數</span><b>${t.rsvp.length} / ${t.cap}</b></div>
           <div class="ct"><div class="cf" style="width:${pct}%"></div></div>
-          <div class="rsvp-names">${t.rsvp.map(p=>p).join("、")||"尚無人報名"}</div>
+          <div class="rsvp-names">${t.rsvp.join("、")||"尚無人報名"}</div>
         </div>
-        <button class="btn-sm ${me?'btn-leave':'btn-join'}" ${full?'disabled style="opacity:.4;cursor:not-allowed"':''}>${me?'取消報名':(full?'已額滿':'我要報名')}</button>
-      </div>
+        <div class="tripbtns">
+          <button class="btn-sm ${me?'btn-leave':'btn-join'}" data-act="rsvp" ${full?'disabled style="opacity:.4;cursor:not-allowed"':''}>${me?'取消報名':(full?'已額滿':'我要報名')}</button>
+          ${canManage()?`<button class="btn-sm btn-convert" data-act="convert">轉成出隊紀錄</button>`:""}
+        </div>
+      </div>`}
     </div>`;
   }).join("") : `<div class="empty">目前沒有規劃中的行程，建立第一場吧。</div>`;
 
   $$("#tripList .trip").forEach(el=>{
-    const btn=el.querySelector("button"); if(btn.disabled) return;
-    btn.onclick=()=>{
-      const t=state.trips.find(x=>x.id===+el.dataset.id);
+    const id=+el.dataset.id;
+    const rsvpBtn=el.querySelector('[data-act="rsvp"]');
+    if(rsvpBtn && !rsvpBtn.disabled) rsvpBtn.onclick=()=>{
+      const t=state.trips.find(x=>x.id===id);
       const i=t.rsvp.indexOf(state.user.name);
       if(i>=0){ t.rsvp.splice(i,1); toast("已取消報名"); }
       else { t.rsvp.push(state.user.name); toast(`已報名：${t.title}`); }
       renderTrips(); renderHome(); renderStats();
     };
+    const convBtn=el.querySelector('[data-act="convert"]');
+    if(convBtn) convBtn.onclick=()=> convertTrip(id);
   });
 }
+function convertTrip(id){ const t=state.trips.find(x=>x.id===id); if(t) openHikeAdd(t); }
 
 /* ============================================================
    渲染：行前須知
@@ -1359,7 +1622,8 @@ $("#profileModal").onclick = e=>{ if(e.target.id==="profileModal") closeProfile(
 $("#memberModal").onclick = e=>{ if(e.target.id==="memberModal") $("#memberModal").classList.remove("on"); };
 $("#addPeakBtn").onclick = openPeakAdd;
 $("#peakModal").onclick = e=>{ if(e.target.id==="peakModal") $("#peakModal").classList.remove("on"); };
-document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeProfile(); $("#memberModal").classList.remove("on"); $("#peakModal").classList.remove("on"); } });
+$("#hikeModal").onclick = e=>{ if(e.target.id==="hikeModal") $("#hikeModal").classList.remove("on"); };
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeProfile(); $("#memberModal").classList.remove("on"); $("#peakModal").classList.remove("on"); $("#hikeModal").classList.remove("on"); } });
 
 /* PWA：註冊 service worker（讓網站可安裝、可離線開啟） */
 if("serviceWorker" in navigator){
